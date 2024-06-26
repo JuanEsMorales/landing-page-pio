@@ -1,0 +1,127 @@
+<main class="products-page">
+  <div class="slides-wrapper-product">
+    <section id="main-slider" class="splide" aria-label="splide">
+      <div class="splide__track">
+        <ul class="splide__list">
+          <li class="splide__slide">
+            <div class="image-container">
+              <img src="../{{image}}" alt="{{name}}">
+            </div>
+          </li>
+          {{#if secondImage}}
+          <li class="splide__slide">
+            <div class="image-container">
+              <img src="../{{secondImage}}" alt="{{name}}">
+            </div>
+          </li>
+          {{/if}}
+        </ul>
+      </div>
+    </section>
+    <section id="thumbnail-slider" class="splide" aria-label="splide">
+      <div class="splide__track">
+        <ul class="splide__list" style="gap: 20px;">
+          <li class="splide__slide">
+            <div class="image-container">
+              <img src="../{{image}}" alt="{{name}}">
+            </div>
+          </li>
+          {{#if secondImage}}
+          <li class="splide__slide">
+            <div class="image-container">
+              <img src="../{{secondImage}}" alt="{{name}}">
+            </div>
+          </li>
+          {{/if}}
+        </ul>
+      </div>
+    </section>
+  </div>
+  <article class="information-product">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <h1>{{name}}</h1>
+      {{#if previuosPrice}}
+        <p class="previuos-price" style="margin: 0; text-decoration: line-through;">{{previuosPrice}}</p>
+      {{/if}}
+      <p style="margin: 0;"><strong>{{price}}</strong></p>
+    </div>
+    <p>{{description}}</p>
+    <div class="sizes-available">
+      <small>Tallas disponibles</small>
+      <div style="display: flex; gap: 10px;">
+        {{#each sizesAvailable}}
+          <div class="size-available">{{this}}</div>
+        {{/each}}
+      </div>
+    </div>
+    <button class="btn-buy">¡Me interesa!</button>
+  </article>
+</main>
+<section class="related-products">
+  <h2>Productos relacionados</h2>
+  <section class="splide" id="realted-products" aria-label="Splide Basic HTML Example">
+    <div class="splide__track">
+      <ul class="splide__list">
+        {{#each relatedProducts}}
+          <li class="splide__slide">
+            <a href="/{{../category}}/{{id}}" class="image-container">
+              <img src="../{{image}}" alt="{{name}}">
+              <img class="image-appear" src="../{{secondImage}}" alt="{{name}}">
+              <p>{{price}}</p>
+            </a>
+          </li>
+        {{/each}}
+      </ul>
+    </div>
+  </section>
+</section>
+<script>
+  document.addEventListener( 'DOMContentLoaded', function() {
+        let main = new Splide( '#main-slider', {
+      type       : 'fade',
+      drag   : 'free',
+      snap   : true,
+      heightRatio: 0.5,
+      pagination : false,
+      arrows     : false,
+      cover      : true,
+    } );
+
+    let thumbnails = new Splide( '#thumbnail-slider', {
+      rewind          : true,
+      fixedWidth      : 204,
+      fixedHeight     : 108,
+      isNavigation    : true,
+      gap             : 10,
+      focus           : 'center',
+      pagination      : false,
+      cover           : true,
+      arrows     : false,
+      dragMinThreshold: {
+        mouse: 4,
+        touch: 10,
+      },
+      breakpoints : {
+        640: {
+          fixedWidth  : 66,
+          fixedHeight : 38,
+        },
+      },
+    } );
+
+    let relatedProducts = new Splide( '#realted-products', {
+      type   : 'loop',
+      drag   : 'free',
+      snap   : true,
+      perPage: 3,
+      perMove: 1,
+      pagination: false,
+      gap: 20,
+    });
+
+    main.sync( thumbnails );
+    main.mount();
+    thumbnails.mount();
+    relatedProducts.mount();
+      } );
+</script>
