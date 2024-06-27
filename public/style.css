@@ -49,6 +49,10 @@ body {
   width: 900px;
 }
 
+#first-slide .image-container {
+  display: block;
+}
+
 h2 {
   margin-block: 65px;;
 }
