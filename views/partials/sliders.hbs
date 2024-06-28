@@ -169,6 +169,11 @@
       autoplay: true,
       pagination: false,
       gap: 20,
+      breakpoints: {
+        975: {
+          perPage: 2,
+        },
+      }
     }
     let splide = new Splide( '#first-slide', {
       type   : 'loop',
@@ -178,6 +183,14 @@
       autoplay: true,
       pagination: false,
       gap: 20,
+      breakpoints: {
+        975: {
+          perPage: 2,
+        },
+        605: {
+          perPage: 1,
+        },
+      }
     });
     let splide2 = new Splide( '#second-slide', opt);
     let splide3 = new Splide( '#third-slide', opt);
