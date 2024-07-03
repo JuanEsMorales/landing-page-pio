@@ -1,4 +1,6 @@
+import { getNewCollections } from "../models/collections.js"
 import { getProductById, getRelatedProducts } from "../models/products.js"
+import { getProductsInPromotion } from "../models/promotions.js"
 
 const jeansOnPromotion = [
   {
@@ -163,4 +165,10 @@ export async function getProduct(req, res) {
     relatedProducts: relatedProducts,
     category,
   });
+}
+
+export async function getProductsForSlides(req, res) {
+  const productsInPromotion = await getProductsInPromotion();
+  const collections = await getNewCollections();
+  res.send(productsInPromotion, collections);
 }

@@ -22,12 +22,13 @@ app.engine('hbs', engine({
 }));
 app.set('view engine', 'hbs');
 
-app.use(landingRouter)
+app.use('/landing',landingRouter)
 app.use('/admin', dashboardRouter)
 
 app.get('/', (req, res) => {
-  res.render('index');
+  res.redirect('/landing');
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server running on port http://localhost:${PORT}`);
