@@ -78,6 +78,10 @@ export async function editProduct(req, res) {
 
   console.log(data, id);
 
+  if (data.price) {
+    data.price = parseInt(data.price);
+  }
+
   if (images) {
     const imageUrls = Object.values(images).map(fileArray => fileArray[0].path);
     data.img1_url = imageUrls[0];
@@ -88,6 +92,12 @@ export async function editProduct(req, res) {
   if (data.tallas) {
     const sizes = JSON.parse(data.tallas);
     data.available_sizes = sizes;
+  }
+
+  if (data.img1_url === 'null' || data.img2_url === 'null' || data.img3_url === 'null') {
+    data.img1_url = null;
+    data.img2_url = null;
+    data.img3_url = null;
   }
   
 
