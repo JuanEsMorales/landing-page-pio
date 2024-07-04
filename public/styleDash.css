@@ -1,0 +1,9 @@
+.container-all-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.card p {
+  margin-bottom: 0;
+}

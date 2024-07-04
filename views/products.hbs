@@ -1,0 +1,241 @@
+<div class="p-3 w-100 d-flex justify-content-center align-items-start" style="position: relative;">
+  <div class="container-all-products w-75">
+    {{#each products}}
+      <div class="card bg-dark" style="width: 200px;" data-bs-theme="dark">
+        <div class="card-header">
+          {{name}}
+          {{#if is_in_promotion}}
+            <span class="badge rounded-pill text-bg-warning">Promo</span>
+          {{/if}}
+        </div>
+        <img src="{{img1_url}}" alt="{{name}}" class="w-100 card-img-top">
+        <div class="card-body">
+          <p class="card-text">{{persons_destinataries}}</p>
+          <p class="card-text">{{category}}</p>
+          <p class="card-text">${{price}}</p>
+          <div class="mt-3">
+            <button type="button" class="btn btn-light {{id}} edit">Editar</button>
+            <button type="button" class="btn btn-danger {{id}} delete" >Eliminar</button>
+          </div>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+  <form class="w-25" style="position: sticky; top: 60px; max-height: 660px; overflow-y: auto; overflow-x: hidden;">
+    <div class="form-floating mb-1">
+      <input type="text" class="form-control" id="name" placeholder="Nombre" >
+      <label for="name" class="form-label">Nombre</label>
+    </div>
+    <div class="form-floating mb-1">
+      <textarea class="form-control" id="description" placeholder="Descripción" rows="3" ></textarea>
+      <label for="description" class="form-label">Descripción</label>
+    </div>
+    <div class="mb-1">
+      <label for="category" class="form-label">Categoría</label>
+      <select class="form-select" aria-label="Default select example" id="category">
+        <option value="" selected>Seleccionar</option>
+        <option value="jeans">Jeans</option>
+        <option value="jackets">Chaquetas</option>
+      </select>
+    </div>
+    <div class="mb-1">
+      <label for="destinataries" class="form-label">Destinatarios</label>
+      <select class="form-select" aria-label="Default select example" id="destinataries">
+        <option value="">Seleccionar</option>
+        <option value="women">Mujeres</option>
+        <option value="men">Hombres</option>
+      </select>
+    </div>
+    <div class="form-floating mb-1">
+      <input type="number" class="form-control" placeholder="Precio" id="price" >
+      <label for="price" class="form-label">Precio</label>
+    </div>
+    <div class="mb-1">
+      <label for="img" class="form-label">Imagenes</label>
+      <div>
+        <div class="col-md-6">
+          <input type="file" class="form-control-file" id="img1" name="img1" accept="image/*" >
+          <img src="" alt="" class="img1" style="max-height: 50px;">
+        </div>
+        <div class="col-md-6">
+          <input type="file" class="form-control-file" id="img2" name="img2" accept="image/*" >
+          <img src="" alt="" class="img2" style="max-height: 50px;">
+        </div>
+        <div class="col-md-6">
+          <input type="file" class="form-control-file" id="img3" name="img3" accept="image/*">
+          <img src="" alt="" class="img3" style="max-height: 50px;">
+        </div>
+      </div>
+    </div>
+    <div class="mb-1">
+      <label for="sizes" class="form-label">Tallas</label>
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Talla1" id="talla1" aria-label="Talla">
+        <input type="text" class="form-control" placeholder="Talla2" id="talla2" aria-label="Talla">
+        <input type="text" class="form-control" placeholder="Talla3" id="talla3" aria-label="Talla">
+      </div>
+    </div>
+    <div class="mt-1" id="edit-promo">
+      <button type="submit" class="btn btn-info">Crear</button>
+      {{!-- <button type="button" class="btn btn-secondary" id="promotion">Promocionar</button> --}}
+    </div>
+  </form>
+</div>
+<script>
+  const form = document.querySelector('form');
+  const img_1 = document.querySelector('.img1');
+  const img_2 = document.querySelector('.img2');
+  const img_3 = document.querySelector('.img3');
+
+  let img1 = null
+  let img2 = null
+  let img3 = null
+
+  const putImage = () => {
+    const images = document.querySelectorAll('input[type="file"]');
+    images.forEach(image => {
+      image.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const id = event.target.id;
+        if (id === 'img1') {
+          img_1.src = URL.createObjectURL(file);
+          img1 = file;
+        } else if (id === 'img2') {
+          img_2.src = URL.createObjectURL(file);
+          img2 = file;
+        } else if (id === 'img3') {
+          img_3.src = URL.createObjectURL(file);
+          img3 = file;
+        }
+      });
+    })
+  };
+
+  putImage();
+
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    const name = document.getElementById('name').value;
+    const description = document.getElementById('description').value;
+    const category = document.getElementById('category').value;
+    const destinataries = document.getElementById('destinataries').value;
+    const prevousPrice = document.getElementById('price').value;
+    const price = document.getElementById('price').value;
+    const talla1 = document.getElementById('talla1').value;
+    const talla2 = document.getElementById('talla2').value;
+    const talla3 = document.getElementById('talla3').value;
+
+    const tallas = `["${talla1}", "${talla2}", "${talla3}"]`;
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('category', category);
+    formData.append('destinataries', destinataries);
+    formData.append('price', price);
+    formData.append('img1', img1);
+    formData.append('img2', img2);
+    formData.append('img3', img3);
+    formData.append('tallas', tallas);
+
+    fetch('/admin/products/new', {
+      method: 'POST',
+      body: formData
+    }).then(response => response.json()).then(data => {
+      Toastify({
+        text: data.message,
+        duration: 2000,
+        close: true,
+        gravity: "top", // `top` or `bottom`
+        position: "left", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: "linear-gradient(to right, #00b09b, #96c93d)",
+        },
+      }).showToast();
+    });
+
+    img_1.src = '';
+    img_2.src = '';
+    img_3.src = '';
+    form.reset()
+  });
+
+  const buttonsEdit = document.querySelectorAll('.edit');
+  const buttonsDelete = document.querySelectorAll('.delete');
+
+
+  const buttonEditPromo = document.querySelector('#edit-promo');
+
+  buttonsEdit.forEach(buttonEdit => {
+    buttonEdit.addEventListener('click', function(e) {
+      console.log(e.target.classList[2]);
+      const id = e.target.classList[2];
+      fetch(`/admin/products/${id}`).then(response => response.json()).then(data => {
+        let { id, name, description, category, persons_destinataries, price, img1_url, img2_url, img3_url, available_sizes, is_in_promotion } = data;
+        document.querySelector('#name').value = name;
+        document.querySelector('#description').value = description;
+        document.querySelector('#category').value = category;
+        document.querySelector('#destinataries').value = persons_destinataries;
+        document.querySelector('#price').value = price;
+        document.querySelector('.img1').src = img1_url;
+        document.querySelector('.img2').src = img2_url;
+        document.querySelector('.img3').src = img3_url;
+        document.querySelector('#talla1').value = available_sizes[0];
+        document.querySelector('#talla2').value = available_sizes[1];
+        document.querySelector('#talla3').value = available_sizes[2];
+        buttonEditPromo.innerHTML =  `
+          <button type="button" class="btn btn-info ${id}" onclick="editProduct(this)" id="edit">Guardar</button>
+          <button type="button" class="btn btn-secondary ${id}" id="promotion">Promocionar</button>
+        `
+      });
+    });
+  });
+
+  function editProduct(product) {
+    putImage();
+    const id = product.classList[2];
+    const name = document.getElementById('name').value;
+    const description = document.getElementById('description').value;
+    const category = document.getElementById('category').value;
+    const destinataries = document.getElementById('destinataries').value;
+    const prevousPrice = document.getElementById('price').value;
+    const price = document.getElementById('price').value;
+    const talla1 = document.getElementById('talla1').value;
+    const talla2 = document.getElementById('talla2').value;
+    const talla3 = document.getElementById('talla3').value;
+
+    const tallas = `["${talla1}", "${talla2}", "${talla3}"]`;
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('category', category);
+    formData.append('destinataries', destinataries);
+    formData.append('price', price);
+    formData.append('img1', img1);
+    formData.append('img2', img2);
+    formData.append('img3', img3);
+    formData.append('tallas', tallas);
+
+    console.log(formData.get('tallas'));
+    fetch(`/admin/products/${id}`, {
+      method: 'PATCH',
+      body: formData
+    }).then(response => response.json()).then(data => {
+      Toastify({
+        text: data.error || data.message,
+        duration: 2000,
+        close: true,
+        gravity: "top", // `top` or `bottom`
+        position: "left", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: "linear-gradient(to right, #00b09b, #96c93d)",
+        },
+      }).showToast();
+      img_1.src = '';
+      img_2.src = '';
+      img_3.src = '';
+      form.reset()
+    });
+  }
+</script>

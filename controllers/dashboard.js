@@ -36,7 +36,28 @@ export async function getProduct(req, res) {
 }
 
 export async function createProduct(req, res) {
-  const data = req.body;
+  const { name, description, category, destinataries, price, tallas } = req.body;
+  const images = req.files;
+
+
+  const imageUrls = Object.values(images).map(fileArray => fileArray[0].path);
+
+  const sizes = JSON.parse(tallas);
+
+  const data = {
+    name,
+    description,
+    category,
+    persons_destinataries: destinataries,
+    price: parseInt(price),
+    img1_url: imageUrls[0],
+    img2_url: imageUrls[1],
+    img3_url: imageUrls[2],
+    available_sizes: sizes,
+    is_in_promotion: false,
+  }
+
+
   const { error } = validateProduct(data);
   if (error) {
     res.status(400).json({ error });
@@ -53,7 +74,25 @@ export async function createProduct(req, res) {
 export async function editProduct(req, res) {
   const { id } = req.params;
   let data = req.body;
+  const images = req.files;
+
+  console.log(data, id);
+
+  if (images) {
+    const imageUrls = Object.values(images).map(fileArray => fileArray[0].path);
+    data.img1_url = imageUrls[0];
+    data.img2_url = imageUrls[1];
+    data.img3_url = imageUrls[2];
+  }
+
+  if (data.tallas) {
+    const sizes = JSON.parse(data.tallas);
+    data.available_sizes = sizes;
+  }
+  
+
   const { error } = validatePartialProduct(data);
+
   if (error) {
     res.status(400).send(error);
   } else {
@@ -84,7 +123,7 @@ export async function getAllProducts(req, res) {
     res.send(products);
   } else {
     const products = await getProducts();
-    res.send(products);
+    res.render("products", { layout: "dashboard", products });
   }
 }
 

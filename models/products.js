@@ -92,6 +92,7 @@ export async function getProductById(id) {
 }
 
 export async function updateProduct(id, fieldsToUpdate) {
+  console.log(fieldsToUpdate, id);
   if (Object.keys(fieldsToUpdate).length === 0) {
     return { error: "No hay campos para actualizar" }
   }
