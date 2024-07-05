@@ -1,7 +1,7 @@
-<div class="p-3 w-100 d-flex justify-content-center align-items-start" style="position: relative;">
+<div class="p-3 w-100 d-flex justify-content-center align-items-start gap-3" style="position: relative;">
   <div class="container-all-products w-75">
     {{#each products}}
-      <div class="card bg-dark" style="width: 200px;" data-bs-theme="dark">
+      <div class="card bg-dark" style="width: 200px;" data-bs-theme="dark" id="card-{{id}}">
         <div class="card-header">
           {{name}}
           {{#if is_in_promotion}}
@@ -46,9 +46,9 @@
         <option value="men">Hombres</option>
       </select>
     </div>
-    <div class="form-floating mb-1">
+    <div class="form-floating mb-1 priceField">
       <input type="number" class="form-control" placeholder="Precio" id="price" >
-      <label for="price" class="form-label">Precio</label>
+      <label for="price" class="form-label priceLabel">Precio</label>
     </div>
     <div class="mb-1">
       <label for="img" class="form-label">Imagenes</label>
@@ -152,12 +152,24 @@
           background: "linear-gradient(to right, #00b09b, #96c93d)",
         },
       }).showToast();
-    });
-
-    img_1.src = '';
-    img_2.src = '';
-    img_3.src = '';
-    form.reset()
+      img_1.src = '';
+      img_2.src = '';
+      img_3.src = '';
+      form.reset()
+    }).catch(error => {
+      console.log(error);
+      Toastify({
+        text: error,
+        duration: 2000,
+        close: true,
+        gravity: "top", // `top` or `bottom`
+        position: "left", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: "linear-gradient(to right, #00b09b, #96c93d)",
+        },
+      }).showToast();
+    })
   });
 
   const buttonsEdit = document.querySelectorAll('.edit');
@@ -168,10 +180,9 @@
 
   buttonsEdit.forEach(buttonEdit => {
     buttonEdit.addEventListener('click', function(e) {
-      console.log(e.target.classList[2]);
       const id = e.target.classList[2];
       fetch(`/admin/products/${id}`).then(response => response.json()).then(data => {
-        let { id, name, description, category, persons_destinataries, price, img1_url, img2_url, img3_url, available_sizes, is_in_promotion } = data;
+        let { id, name, description, category, persons_destinataries, price, img1_url, img2_url, img3_url, available_sizes, is_in_promotion, previous_price } = data;
         document.querySelector('#name').value = name;
         document.querySelector('#description').value = description;
         document.querySelector('#category').value = category;
@@ -183,22 +194,32 @@
         document.querySelector('#talla1').value = available_sizes[0];
         document.querySelector('#talla2').value = available_sizes[1];
         document.querySelector('#talla3').value = available_sizes[2];
-        buttonEditPromo.innerHTML =  `
+        if (is_in_promotion) {
+          putFieldPreviousPrice(previous_price)
+          buttonEditPromo.innerHTML =  `
           <button type="button" class="btn btn-info ${id}" onclick="editProduct(this)" id="edit">Guardar</button>
-          <button type="button" class="btn btn-secondary ${id}" id="promotion">Promocionar</button>
+          <button type="button" class="btn btn-danger" onclick="removeFieldNewPrice(${id})" id="promotion">Quitar Promoción</button>
         `
+        } else {
+          const newPriceField = document.querySelector('.newPriceField');
+          newPriceField?.parentNode.removeChild(newPriceField);
+          buttonEditPromo.innerHTML =  `
+            <button type="button" class="btn btn-info ${id}" onclick="editProduct(this)" id="edit">Guardar</button>
+            <button type="button" class="btn btn-warning" onclick="putFieldNewPrice(${id})" id="promotion">Promocionar</button>
+          `
+        }
       });
     });
   });
 
-  function editProduct(product) {
+  async function editProduct(product) {
     putImage();
     const id = product.classList[2];
     const name = document.getElementById('name').value;
     const description = document.getElementById('description').value;
     const category = document.getElementById('category').value;
     const destinataries = document.getElementById('destinataries').value;
-    const prevousPrice = document.getElementById('price').value;
+    const newPrice = document.getElementById('newPrice')?.value;
     const price = document.getElementById('price').value;
     const talla1 = document.getElementById('talla1').value;
     const talla2 = document.getElementById('talla2').value;
@@ -210,19 +231,26 @@
     formData.append('description', description);
     formData.append('category', category);
     formData.append('persons_destinataries', destinataries);
-    formData.append('price', price);
     formData.append('img1_url', img1);
     formData.append('img2_url', img2);
     formData.append('img3_url', img3);
     formData.append('tallas', tallas);
+    if (newPrice) {
+      formData.append('newPrice', newPrice);
+      formData.append('previousPrice', price);
+    } else {
+      formData.append('price', price);
+    }
+    console.log(formData.get('previousPrice'), price);
 
-    console.log(formData.get('tallas'));
-    fetch(`/admin/products/${id}`, {
+    const response = await fetch(`/admin/products/${id}`, {
       method: 'PATCH',
       body: formData
-    }).then(response => response.json()).then(data => {
+    })
+    const data = await response.json();
+    if (data.error) {
       Toastify({
-        text: data.error || data,
+        text: data.error,
         duration: 2000,
         close: true,
         gravity: "top", // `top` or `bottom`
@@ -232,10 +260,99 @@
           background: "linear-gradient(to right, #00b09b, #96c93d)",
         },
       }).showToast();
-      img_1.src = '';
-      img_2.src = '';
-      img_3.src = '';
-      form.reset()
-    });
+      return;
+    }
+    Toastify({
+      text: data.message,
+      duration: 2000,
+      close: true,
+      gravity: "top", // `top` or `bottom`
+      position: "left", // `left`, `center` or `right`
+      stopOnFocus: true, // Prevents dismissing of toast on hover
+      style: {
+        background: "linear-gradient(to right, #00b09b, #96c93d)",
+      },
+    }).showToast();
+    img_1.src = '';
+    img_2.src = '';
+    img_3.src = '';
+    form.reset()
+    buttonEditPromo.innerHTML =  `
+     <button type="submit" class="btn btn-info">Crear</button>
+    `
   }
+
+  function putFieldNewPrice(id) {
+    const priceField = document.querySelector('.priceField');
+    const newPriceField = `
+      <div class="form-floating mb-1 newPriceField">
+        <input type="number" class="form-control" placeholder="Nuevo Precio" id="newPrice"" >
+        <label for="newPrice" class="form-label">Nuevo Precio</label>
+      </div>
+    `
+    priceField.insertAdjacentHTML('beforeend', newPriceField);
+   buttonEditPromo.innerHTML =  `
+    <button type="button" class="btn btn-info ${id}" onclick="editProduct(this)" id="edit">Guardar</button>
+    <button type="button" class="btn btn-danger" onclick="removeFieldNewPrice(${id})" id="promotion">Quitar Promoción</button>
+  `
+  }
+
+  function putFieldPreviousPrice(previousPrice) {
+    const priceField = document.querySelector('.priceField');
+    const previousPriceField = `
+      <div class="form-floating mb-1 newPriceField">
+        <input type="number" class="form-control" value="${previousPrice}" placeholder="Precio anterior" id="previousPrice" readonly disabled>
+        <label for="previousPrice" class="form-label">Precio anterior</label>
+      </div>
+    `
+    priceField.insertAdjacentHTML('beforebegin', previousPriceField);
+  }
+
+  function removeFieldNewPrice(id) {
+    const newPriceField = document.querySelector('.newPriceField');
+    newPriceField.parentNode.removeChild(newPriceField);
+    buttonEditPromo.innerHTML =  `
+      <button type="button" class="btn btn-info ${id}" onclick="editProduct(this)" id="edit">Guardar</button>
+      <button type="button" class="btn btn-warning" onclick="putFieldNewPrice(${id})" id="promotion">Promocionar</button>
+    `
+  }
+
+  buttonsDelete.forEach(buttonDelete => {
+    buttonDelete.addEventListener('click', function(e) {
+      const id = e.target.classList[2];
+      fetch(`/admin/products/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then(response => response.json()).then(data => {
+        if (data.error) {
+          Toastify({
+            text: data.error,
+            duration: 2000,
+            close: true,
+            gravity: "top", // `top` or `bottom`
+            position: "left", // `left`, `center` or `right`
+            stopOnFocus: true, // Prevents dismissing of toast on hover
+            style: {
+              background: "linear-gradient(to right, #00b09b, #96c93d)",
+            },
+          }).showToast();
+          return;
+        }
+        Toastify({
+          text: data.message,
+          duration: 2000,
+          close: true,
+          gravity: "top", // `top` or `bottom`
+          position: "left", // `left`, `center` or `right`
+          stopOnFocus: true, // Prevents dismissing of toast on hover
+          style: {
+            background: "linear-gradient(to right, #00b09b, #96c93d)",
+          },
+        }).showToast();
+        document.querySelector(`#card-${id}`).remove();
+      });
+    });
+  })
 </script>

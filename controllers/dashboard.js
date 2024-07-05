@@ -60,7 +60,7 @@ export async function createProduct(req, res) {
 
   const { error } = validateProduct(data);
   if (error) {
-    res.status(400).json({ error });
+    res.status(400).json({ error: error.issues[0].message });
   } else {
     const { error } = await addProduct(data);
     if (error) {
@@ -73,53 +73,98 @@ export async function createProduct(req, res) {
 
 export async function editProduct(req, res) {
   const { id } = req.params;
-  let data = req.body;
+  let { name, description, category, persons_destinataries, price, newPrice, previousPrice, tallas, img1_url, img2_url, img3_url } = req.body;
   const images = req.files;
 
-  console.log(data, id);
+  price = parseInt(price);
+  tallas = JSON.parse(tallas);
 
-  if (data.price) {
-    data.price = parseInt(data.price);
+  
+  const data = {
+    
   }
-
+  // look if any data has been changed
+  
+  const product = await getProductById(id);
+  
+  if (product.name != name) {
+    data.name = name;
+  }
+  if (product.description != description) {
+    data.description = description;
+  }
+  if (product.category != category) {
+    data.category = category;
+  }
+  if (product.persons_destinataries != persons_destinataries) {
+    data.persons_destinataries = persons_destinataries;
+  }
+  if (newPrice) {
+    newPrice = parseInt(newPrice);
+    previousPrice = parseInt(previousPrice);
+    if (newPrice >= product.price) {
+      return res.status(400).json({ error: "El nuevo precio debe ser menor que el actual" });
+    }
+    data.previous_price = previousPrice;
+    data.price = newPrice;
+    data.is_in_promotion = true;
+  } else if (product.is_in_promotion) {
+    data.previous_price = null;
+    data.is_in_promotion = false;
+    if (price != product.price) {
+      data.price = price;
+    }
+  } else {
+    data.price = price;
+  }
+  function arraysEqual(arr1, arr2) {
+    console.log(arr1, arr2);
+    if (arr1.length !== arr2.length) return false;
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) return false;
+    }
+    return true;
+  }
+  if (!arraysEqual(product.available_sizes, tallas)) {
+    data.available_sizes = tallas;
+  }
   if (images) {
     const imageUrls = Object.values(images).map(fileArray => fileArray[0].path);
-    data.img1_url = imageUrls[0];
-    data.img2_url = imageUrls[1];
-    data.img3_url = imageUrls[2];
+    img1_url = imageUrls[0];
+    img2_url = imageUrls[1];
+    img3_url = imageUrls[2];
+    if (img1_url !== 'null' && img1_url != product.img1_url && img1_url !== undefined) {
+      data.img1_url = img1_url;
+    }
+    if (img2_url !== 'null' && img2_url != product.img2_url && img2_url !== undefined) {
+      data.img2_url = img2_url;
+    }
+    if (img3_url !== 'null' && img3_url != product.img3_url && img3_url !== undefined) {
+      data.img3_url = img3_url;
+    }
   }
-
-  if (data.tallas) {
-    const sizes = JSON.parse(data.tallas);
-    data.available_sizes = sizes;
+  if (data.length == 0) {
+   return res.status(400).json({ error: "No hay datos para actualizar" });
   }
-
-  if (data.img1_url === 'null' || data.img2_url === 'null' || data.img3_url === 'null') {
-    data.img1_url = null;
-    data.img2_url = null;
-    data.img3_url = null;
-  }
-  
-
   const { error } = validatePartialProduct(data);
 
   if (error) {
-    res.status(400).send(error);
+    res.status(400).json({error: error.issues[0].message});
   } else {
     const { error } = await updateProduct(id, data);
     if (error) {
-      res.status(400).send(error);
+      res.status(400).json({error});
     } else {
-      res.status(200).send({ message: 'Producto actualizado' });
+      res.status(200).json({ message: 'Producto actualizado' });
     }
   }
 }
 
 export async function removeProduct(req, res) {
   const { id } = req.params;
-  const { error } = await deleteProduct(id);
+  const { error, message } = await deleteProduct(id);
   if (error) {
-    res.status(400).json({ error });
+    res.status(400).json({ error, message });
   } else {
     res.status(200).json({ message: 'Producto eliminado' });
   }
@@ -159,7 +204,7 @@ export async function createCollection(req, res) {
   const data = req.body;
   const { error } = validateCollection(data);
   if (error) {
-    res.status(400).json({ error });
+    res.status(400).json({ error: error.issues[0].message });
   } else {
     const { error } = await addCollection(data);
     if (error) {
@@ -175,7 +220,7 @@ export async function editCollection(req, res) {
   const data = req.body;
   const { error } = validatePartialCollection(data);
   if (error) {
-    res.status(400).json({ error });
+    res.status(400).json({ error: error.issues[0].message });
   } else {
     const { error } = await updateCollection(id, data);
     if (error) {
@@ -196,49 +241,7 @@ export async function removeCollection(req, res) {
   }
 }
 
-export async function createProductInPromotion(req, res) {
-  const { error } = validateProductInPromotion(req.body);
-  const { newPrice, previuosPrice, id } = req.body;
-  if (error) {
-    res.status(400).json({ error });
-  } else {
-    const { error } = await addProductToPromotion(id, newPrice, previuosPrice);
-    if (error) {
-      res.status(400).json({ error });
-    } else {
-      res.status(201).json({ message: 'Producto agregado' });
-    }
-  }
-}
-
 export async function getAllProductsInPromotion(req, res) {
   const products = await getProductsInPromotion();
   res.send(products);
-}
-
-export async function updateProductInPromotion(req, res) {
-  const { id } = req.params;
-  const { newPrice, previuosPrice } = req.body;
-  const { error } = validatePartialProductInPromotion(data);
-  if (error) {
-    res.status(400).json({ error });
-  } else {
-    const { error } = await updateProductFromPromotion(id, newPrice, previuosPrice);
-    if (error) {
-      res.status(400).json({ error });
-    } else {
-      res.status(200).json({ message: 'Producto actualizado' });
-    }
-  }
-}
-
-export async function deleteProductInPromotion(req, res) {
-  const { id } = req.params;
-  const { previuosPrice } = req.body;
-  const { error } = await deleteProductFromPromotion(id, previuosPrice);
-  if (error) {
-    res.status(400).json({ error });
-  } else {
-    res.status(200).json({ message: 'Producto eliminado' });
-  }
 }

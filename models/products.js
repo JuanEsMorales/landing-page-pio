@@ -92,7 +92,6 @@ export async function getProductById(id) {
 }
 
 export async function updateProduct(id, fieldsToUpdate) {
-  console.log(fieldsToUpdate, id);
   if (Object.keys(fieldsToUpdate).length === 0) {
     return { error: "No hay campos para actualizar" }
   }
@@ -121,6 +120,6 @@ export async function deleteProduct(id) {
     await pool.query(query, [id])
     return { message: "Producto eliminado" }
   } catch (error) {
-    return { error: "Error al eliminar producto" }
+    return { error: "Error al eliminar producto", message: error.message }
   }
 }

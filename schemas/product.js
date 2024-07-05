@@ -19,7 +19,7 @@ const productSchema = z.object({
   })).min(1).max(100),
   previous_price: z.number({
     invalid_type_error: "El precio anterior debe ser de tipo number",
-  }).min(1).max(999999).optional(),
+  }).min(1).max(999999).nullable().optional(),
   price: z.number({
     required_error: "El precio es obligatorio",
     invalid_type_error: "El precio debe ser de tipo number",

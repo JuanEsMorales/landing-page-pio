@@ -3,7 +3,7 @@ import multer from 'multer';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
 import cloudinary from '../cloudinaryConfig.js';
-import { createCollection, createProduct, createProductInPromotion, deleteProductInPromotion, editCollection, editProduct, formCreateProduct, getAllProducts, getAllProductsInPromotion, getCollection, getCollections, getProduct, removeCollection, removeProduct } from '../controllers/dashboard.js';
+import { createCollection, createProduct, editCollection, editProduct, getAllProducts, getAllProductsInPromotion, getCollection, getCollections, getProduct, removeCollection, removeProduct } from '../controllers/dashboard.js';
 
 const router = Router();
 
@@ -31,13 +31,11 @@ router.get('/logout', );
 
 router.get('/products', getAllProducts);
 
-router.get('/products/new', formCreateProduct);
-
 router.post('/products/new', upload.fields([{ name: 'img1' }, { name: 'img2' }, { name: 'img3' }]), createProduct);
 
 router.get('/products/:id', getProduct);
 
-router.patch('/products/:id', upload.fields([{ name: 'img1' }, { name: 'img2' }, { name: 'img3' }]), editProduct);
+router.patch('/products/:id', upload.fields([{ name: 'img1_url' }, { name: 'img2_url' }, { name: 'img3_url' }]), editProduct);
 
 router.delete('/products/:id', removeProduct);
 
@@ -53,8 +51,5 @@ router.delete('/collections/:id', removeCollection);
 
 router.get('/promotion', getAllProductsInPromotion);
 
-router.post('/promotion', createProductInPromotion);
-
-router.delete('/promotion/:id', deleteProductInPromotion);
 
 export default router;
