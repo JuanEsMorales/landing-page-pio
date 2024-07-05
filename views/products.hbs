@@ -10,6 +10,7 @@
         </div>
         <img src="{{img1_url}}" alt="{{name}}" class="w-100 card-img-top">
         <div class="card-body">
+          <p class="card-text">ID: {{id}}</p>
           <p class="card-text">{{persons_destinataries}}</p>
           <p class="card-text">{{category}}</p>
           <p class="card-text">${{price}}</p>
@@ -113,7 +114,7 @@
 
   putImage();
 
-  form.addEventListener('submit', function(event) {
+  form.addEventListener('submit', async function(event) {
     event.preventDefault();
     const name = document.getElementById('name').value;
     const description = document.getElementById('description').value;
@@ -137,39 +138,40 @@
     formData.append('img3', img3);
     formData.append('tallas', tallas);
 
-    fetch('/admin/products/new', {
+    const response = await fetch('/admin/products/new', {
       method: 'POST',
       body: formData
-    }).then(response => response.json()).then(data => {
-      Toastify({
-        text: data.message,
-        duration: 2000,
-        close: true,
-        gravity: "top", // `top` or `bottom`
-        position: "left", // `left`, `center` or `right`
-        stopOnFocus: true, // Prevents dismissing of toast on hover
-        style: {
-          background: "linear-gradient(to right, #00b09b, #96c93d)",
-        },
-      }).showToast();
-      img_1.src = '';
-      img_2.src = '';
-      img_3.src = '';
-      form.reset()
-    }).catch(error => {
-      console.log(error);
-      Toastify({
-        text: error,
-        duration: 2000,
-        close: true,
-        gravity: "top", // `top` or `bottom`
-        position: "left", // `left`, `center` or `right`
-        stopOnFocus: true, // Prevents dismissing of toast on hover
-        style: {
-          background: "linear-gradient(to right, #00b09b, #96c93d)",
-        },
-      }).showToast();
     })
+    const data = await response.json();
+    if (data.error) {
+      Toastify({
+        text: data.error,
+        duration: 2000,
+        close: true,
+        gravity: "top", // `top` or `bottom`
+        position: "left", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: "linear-gradient(to right, #00b09b, #96c93d)",
+        },
+      }).showToast();
+      return;
+    }
+    Toastify({
+      text: data.message,
+      duration: 2000,
+      close: true,
+      gravity: "top", // `top` or `bottom`
+      position: "left", // `left`, `center` or `right`
+      stopOnFocus: true, // Prevents dismissing of toast on hover
+      style: {
+        background: "linear-gradient(to right, #00b09b, #96c93d)",
+      },
+    }).showToast();
+    img_1.src = '';
+    img_2.src = '';
+    img_3.src = '';
+    form.reset()
   });
 
   const buttonsEdit = document.querySelectorAll('.edit');

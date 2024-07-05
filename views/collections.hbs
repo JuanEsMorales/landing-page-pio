@@ -1,0 +1,310 @@
+<div class="p-3 w-100 d-flex justify-content-center align-items-start gap-3" style="position: relative;">
+  <div class="container-all-collections w-75">
+    {{#if collections}}
+      {{#each collections}}
+        <div class="card bg-dark" style="width: 250px;" data-bs-theme="dark" id="card-{{id}}">
+        <div class="card-header">
+          {{id}}, {{name}}, {{persons_destinataries}}
+        </div>
+        <div class="card-body">
+          <p class="card-text">{{category}}</p>
+          <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap w-100" style="position: relative; max-height: 300px; overflow-y: auto; ">
+            {{#each products}}
+              <div class="d-flex flex-column justify-content-center align-items-center gap-3 p-1" style="background-color: rgba(255, 255, 255, 0.253); border-radius: 5px;">
+                <img src="
+                  {{#if img_url1}}
+                    {{img_url1}}
+                  {{else}}
+                    {{img_url}}
+                  {{/if}}
+                " alt="{{name}}" style="max-height: 100px;">
+                <span>{{id}}, {{name}}</span>
+              </div>
+            {{/each}}
+          </div>
+          <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap w-100" style="position: relative; max-height: 300px; overflow-y: auto;" id="previous-products">
+
+          </div>
+          <div class="mt-3">
+            <button type="button" class="btn btn-light {{id}} edit">Editar</button>
+            <button type="button" class="btn btn-danger {{id}} delete" >Eliminar</button>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+      {{else}}
+       <h1>No hay colecciones</h1>
+    {{/if}}
+  </div>
+  <form class="w-25" style="position: sticky; top: 60px; max-height: 660px; overflow-y: auto; overflow-x: hidden;">
+    <div class="form-floating mb-1">
+      <input type="text" class="form-control" id="name" placeholder="Nombre" >
+      <label for="name" class="form-label">Nombre</label>
+    </div>
+    <div class="mb-1">
+      <label for="category" class="form-label">Categoría</label>
+      <select class="form-select" aria-label="Default select example" id="category">
+        <option value="" selected>Seleccionar</option>
+        <option value="jeans">Jeans</option>
+        <option value="jackets">Chaquetas</option>
+      </select>
+    </div>
+    <div class="mb-1">
+      <label for="destinataries" class="form-label">Destinatarios</label>
+      <select class="form-select" aria-label="Default select example" id="destinataries">
+        <option value="">Seleccionar</option>
+        <option value="women">Mujeres</option>
+        <option value="men">Hombres</option>
+      </select>
+    </div>
+    <div class="mb-1">
+      <label for="category" class="form-label">Productos</label>
+      <div class="check-container" style="max-height: 300px; overflow-y: auto;">
+        {{#each products}}
+          <div class="form-check d-flex justify-content-start align-items-center">
+            <input class="form-check-input {{name}}" type="checkbox" value="{{id}}" id="{{id}}" name="product">
+            <label class="form-check-label" for="{{id}}" style="margin-left: 5px;">
+              {{id}}, 
+              {{name}}
+              <img src="{{img1_url}}" alt="{{name}}" class="img1-{{id}}" style="max-height: 50px;">
+              <img src="{{img2_url}}" alt="{{name}}" class="img2-{{id}}" style="max-height: 50px;">
+            </label>
+          </div>
+        {{/each}}
+      </div>
+    </div>
+    <div class="mt-1" id="edit">
+      <button type="submit" class="btn btn-info">Crear</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  const form = document.querySelector('form');
+
+  const buttonsEdit = document.querySelectorAll('.edit');
+  const buttonsDelete = document.querySelectorAll('.delete');
+
+
+  let products = []
+
+  buttonsEdit.forEach(button => {
+    button.addEventListener('click', async function() {
+      const idEdit = button.classList[2];
+      const response = await fetch(`/admin/collections/${idEdit}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const responseJson = await response.json();
+      console.log(responseJson);
+      if (responseJson.error) {
+        Toastify({
+          text: responseJson.error,
+          duration: 2000,
+          close: true,
+          gravity: "top", // `top` or `bottom`
+          position: "left", // `left`, `center` or `right`
+          stopOnFocus: true, // Prevents dismissing of toast on hover
+          style: {
+            background: "linear-gradient(to right, #00b09b, #96c93d)",
+          },
+        }).showToast();
+        return;
+      }
+      const { id, name, category, persons_destinataries, products } = responseJson;
+      document.querySelector('#name').value = name;
+      document.querySelector('#category').value = category;
+      document.querySelector('#destinataries').value = persons_destinataries;
+
+      putFieldPreviousProducts(products);
+
+      const edit = document.querySelector('#edit');
+      edit.innerHTML = `
+        <button type="submit" class="btn btn-info ${id}" onclick="editCollection(this)" id="edit">Guardar</button>
+      `
+  })
+  })
+
+  async function editCollection(buttonEdit) {
+    products = []
+    const id = buttonEdit.classList[2];
+    const name = document.getElementById('name').value;
+    const category = document.getElementById('category').value;
+    const destinataries = document.getElementById('destinataries').value;
+    const checks = document.querySelectorAll('.check-container input');
+    checks.forEach(check => {
+      if (check.checked) {
+        const img_url1 = document.querySelector(`.img1-${check.id}`).src;
+        const img_url2 = document.querySelector(`.img2-${check.id}`).src;
+        const product = {
+          id: parseInt(check.id),
+          img_url1,
+          img_url2,
+          name: check.classList[1]
+        }
+        products.push(product);
+      }
+    });
+    const data = {
+      name,
+      category,
+      destinataries,
+      products
+    }
+
+    const response = await fetch(`/admin/collections/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    const responseJson = await response.json();
+    if (responseJson.error) {
+      Toastify({
+        text: responseJson.error,
+        duration: 2000,
+        close: true,
+        gravity: "top", // `top` or `bottom`
+        position: "left", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: "linear-gradient(to right, #00b09b, #96c93d)",
+        },
+      }).showToast();
+      return;
+    }
+    Toastify({
+      text: responseJson.message,
+      duration: 2000,
+      close: true,
+      gravity: "top", // `top` or `bottom`
+      position: "left", // `left`, `center` or `right`
+      stopOnFocus: true, // Prevents dismissing of toast on hover
+      style: {
+        background: "linear-gradient(to right, #00b09b, #96c93d)",
+      },
+    }).showToast();
+  }
+
+  async function removeCollection(button_id) {
+    const id = button_id.classList[2];
+    const response = await fetch(`/admin/collections/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    });
+    const responseJson = await response.json();
+    if (responseJson.error) {
+      Toastify({
+        text: responseJson.error,
+        duration: 2000,
+        close: true,
+        gravity: "top", // `top` or `bottom`
+        position: "left", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: "linear-gradient(to right, #00b09b, #96c93d)",
+        },
+      }).showToast();
+      return;
+    }
+    Toastify({
+      text: responseJson.message,
+      duration: 2000,
+      close: true,
+      gravity: "top", // `top` or `bottom`
+      position: "left", // `left`, `center` or `right`
+      stopOnFocus: true, // Prevents dismissing of toast on hover
+      style: {
+        background: "linear-gradient(to right, #00b09b, #96c93d)",
+      },
+    }).showToast();
+    document.querySelector(`#card-${id}`).remove();
+  }
+
+  function putFieldPreviousProducts(products) {
+    const checks = document.querySelectorAll('.check-container input');
+    products.forEach(product => {
+      checks.forEach(check => {
+        if (check.id == product.id) {
+          check.checked = true;
+        }
+      })
+    })
+  }
+
+  function removeFieldPreviousProducts() {
+    const previousProductsField = document.querySelector('#previous-products');
+    previousProductsField.innerHTML = '';
+  }
+
+  form.addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    products = []
+    const checks = document.querySelectorAll('.check-container input');
+    const name = document.querySelector('#name').value;
+    const category = document.querySelector('#category').value;
+    const destinataries = document.querySelector('#destinataries').value;
+    checks.forEach(check => {
+      if (check.checked) {
+        const img_url1 = document.querySelector(`.img1-${check.id}`).src;
+        const img_url2 = document.querySelector(`.img2-${check.id}`).src;
+        const product = {
+          id: parseInt(check.id),
+          img_url1,
+          img_url2,
+          name: check.classList[1]
+        }
+        products.push(product);
+      }
+    });
+
+    const data = {
+      name,
+      category,
+      destinataries,
+      products
+    }
+
+    const response = await fetch('/admin/collections', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    const responseJson = await response.json();
+    if (responseJson.error) {
+      Toastify({
+        text: responseJson.error,
+        duration: 2000,
+        close: true,
+        gravity: "top", // `top` or `bottom`
+        position: "left", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: "linear-gradient(to right, #00b09b, #96c93d)",
+        },
+      }).showToast();
+      return;
+    }
+    Toastify({
+      text: responseJson.message,
+      duration: 2000,
+      close: true,
+      gravity: "top", // `top` or `bottom`
+      position: "left", // `left`, `center` or `right`
+      stopOnFocus: true, // Prevents dismissing of toast on hover
+      style: {
+        background: "linear-gradient(to right, #00b09b, #96c93d)",
+      },
+    }).showToast();
+    form.reset()
+  });
+
+</script> 

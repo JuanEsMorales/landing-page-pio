@@ -4,6 +4,20 @@
   gap: 10px;
 }
 
+.container-all-collections {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 10px;
+}
+
+.container-all-products img {
+  border-radius: 5px;
+}
+
+.container-all-collections img {
+  border-radius: 5px;
+}
+
 .card p {
   margin-bottom: 0;
 }

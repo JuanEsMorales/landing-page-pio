@@ -32,7 +32,7 @@ export async function addProduct(data) {
     await pool.query(query, values)
     return { message: "Producto agregado" }
   } catch (error) {
-    return { error: "Error al agregar producto", error: error.message }
+    return { error: "Error al agregar producto", message: error }
   }
 }
 

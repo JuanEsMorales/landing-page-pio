@@ -2,7 +2,7 @@ import pool from "./db/database.js"
 
 export async function addCollection(data) {
   try {
-    const { name, category, products } = data
+    const { name, category, products, destinataries } = data
     const productsJson = JSON.stringify(products)
     const collection = await pool.query("SELECT * FROM collections WHERE products = ?", [productsJson])
     if (collection[0].length > 0) {
@@ -10,8 +10,8 @@ export async function addCollection(data) {
         error: "La coleccion ya existe",
       }
     }
-    const query = `INSERT INTO collections (name, category, products) VALUES (?, ?, ?)`
-    const values = [name, category, productsJson]
+    const query = `INSERT INTO collections (name, category, persons_destinataries, products) VALUES (?, ?, ?, ?)`
+    const values = [name, category, destinataries, productsJson]
     await pool.query(query, values)
     return { message: "Coleccion agregada" }
   } catch (error) {
