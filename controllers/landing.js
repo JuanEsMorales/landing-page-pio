@@ -134,8 +134,10 @@ const sizesAvailableJackets = [
 ]
 
 export async function getProduct(req, res) {
+  console.log(req.params.id);
   const product = await getProductById(req.params.id);
   const relatedProducts = await getRelatedProducts(product.category, product.id);
+  console.log({product, relatedProducts});
   if (product.is_in_promotion) {
     const { id, name, description, img1_url, img2_url, img3_url, price, previous_price, category, available_sizes } = product;
     return res.render('product', {
@@ -170,5 +172,5 @@ export async function getProduct(req, res) {
 export async function getProductsForSlides(req, res) {
   const productsInPromotion = await getProductsInPromotion();
   const collections = await getNewCollections();
-  res.send(productsInPromotion, collections);
+  res.render('index', { productsInPromotion, collections });
 }

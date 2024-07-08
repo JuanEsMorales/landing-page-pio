@@ -243,7 +243,6 @@
     } else {
       formData.append('price', price);
     }
-    console.log(formData.get('previousPrice'), price);
 
     const response = await fetch(`/admin/products/${id}`, {
       method: 'PATCH',

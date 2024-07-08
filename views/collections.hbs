@@ -27,7 +27,7 @@
           </div>
           <div class="mt-3">
             <button type="button" class="btn btn-light {{id}} edit">Editar</button>
-            <button type="button" class="btn btn-danger {{id}} delete" >Eliminar</button>
+            <button type="button" class="btn btn-danger {{id}} delete" onclick="removeCollection(this)">Eliminar</button>
           </div>
         </div>
       </div>
@@ -62,7 +62,7 @@
       <div class="check-container" style="max-height: 300px; overflow-y: auto;">
         {{#each products}}
           <div class="form-check d-flex justify-content-start align-items-center">
-            <input class="form-check-input {{name}}" type="checkbox" value="{{id}}" id="{{id}}" name="product">
+            <input class="form-check-input {{name}}" type="checkbox" value="{{id}}" id="{{id}}" data-price="{{price}}" name="product">
             <label class="form-check-label" for="{{id}}" style="margin-left: 5px;">
               {{id}}, 
               {{name}}
@@ -73,8 +73,10 @@
         {{/each}}
       </div>
     </div>
-    <div class="mt-1" id="edit">
-      <button type="submit" class="btn btn-info">Crear</button>
+    <div class="mt-1 d-flex justify-content-center align-items-center gap-3" id="editField">
+      <button type="submit" class="btn btn-info" id="create">Crear</button>
+      <button type="button" class="btn btn-info" style="display: none;" onclick="editCollection(this)" id="edit">Guardar</button>
+      <button type="button" class="btn btn-danger" style="opacity: 0.5;" id="cancel" onclick="cleanForm()" disabled>Cancelar</button>
     </div>
   </form>
 </div>
@@ -84,6 +86,24 @@
 
   const buttonsEdit = document.querySelectorAll('.edit');
   const buttonsDelete = document.querySelectorAll('.delete');
+  const cancel = document.querySelector('#cancel');
+
+  const inputs = document.querySelectorAll('input')
+  const selects = document.querySelectorAll('select')
+
+  selects.forEach(select => {
+    select.addEventListener('change', () => {
+      cancel.style.opacity = '1';
+      cancel.removeAttribute('disabled');
+    })
+  })
+
+  inputs.forEach(input => {
+    input.addEventListener('input', () => {
+      cancel.style.opacity = '1';
+      cancel.removeAttribute('disabled');
+    })
+  })
 
 
   let products = []
@@ -98,7 +118,6 @@
         }
       });
       const responseJson = await response.json();
-      console.log(responseJson);
       if (responseJson.error) {
         Toastify({
           text: responseJson.error,
@@ -120,11 +139,15 @@
 
       putFieldPreviousProducts(products);
 
-      const edit = document.querySelector('#edit');
-      edit.innerHTML = `
-        <button type="submit" class="btn btn-info ${id}" onclick="editCollection(this)" id="edit">Guardar</button>
-      `
-  })
+      const editButton = document.querySelector('#edit');
+      editButton.classList.add(id);
+      editButton.style.display = 'block';
+      const cancel = document.querySelector('#cancel');
+      cancel.style.opacity = '1';
+      cancel.removeAttribute('disabled');
+      const create = document.querySelector('#create');
+      create.style.display = 'none';
+    })
   })
 
   async function editCollection(buttonEdit) {
@@ -142,7 +165,8 @@
           id: parseInt(check.id),
           img_url1,
           img_url2,
-          name: check.classList[1]
+          name: check.classList[1],
+          price: parseInt(check.dataset.price)
         }
         products.push(product);
       }
@@ -150,7 +174,7 @@
     const data = {
       name,
       category,
-      destinataries,
+      persons_destinataries: destinataries,
       products
     }
 
@@ -162,6 +186,7 @@
       body: JSON.stringify(data)
     });
     const responseJson = await response.json();
+    console.log(responseJson.errorMessage);
     if (responseJson.error) {
       Toastify({
         text: responseJson.error,
@@ -228,6 +253,11 @@
 
   function putFieldPreviousProducts(products) {
     const checks = document.querySelectorAll('.check-container input');
+    checks.forEach(check => {
+      if (check.checked) {
+        check.checked = false;
+      }
+    })
     products.forEach(product => {
       checks.forEach(check => {
         if (check.id == product.id) {
@@ -237,15 +267,26 @@
     })
   }
 
-  function removeFieldPreviousProducts() {
-    const previousProductsField = document.querySelector('#previous-products');
-    previousProductsField.innerHTML = '';
+  function cleanForm() {
+    const cancel = document.querySelector('#cancel');
+    const create = document.querySelector('#create');
+    const edit = document.querySelector('#edit');
+    edit.classList.remove(edit.classList[2]);
+    form.reset();
+    cancel.style.opacity = '0.5';
+    cancel.setAttribute('disabled', 'disabled');
+    edit.style.display = 'none';
+    create.style.display = 'block';
   }
 
   form.addEventListener('submit', async function(event) {
     event.preventDefault();
 
     products = []
+
+    cancel.style.opacity = '0.5';
+    cancel.setAttribute('disabled', 'disabled');
+
     const checks = document.querySelectorAll('.check-container input');
     const name = document.querySelector('#name').value;
     const category = document.querySelector('#category').value;
@@ -258,7 +299,8 @@
           id: parseInt(check.id),
           img_url1,
           img_url2,
-          name: check.classList[1]
+          name: check.classList[1],
+          price: parseInt(check.dataset.price)
         }
         products.push(product);
       }

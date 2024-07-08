@@ -36,12 +36,10 @@ export async function getProduct(req, res) {
 }
 
 export async function createProduct(req, res) {
-  console.log(req.body);
   const { name, description, category, destinataries, price, tallas } = req.body;
   const images = req.files;
 
 
-  console.log(req.body);
 
   const imageUrls = Object.values(images).map(fileArray => fileArray[0].path);
 
@@ -59,7 +57,6 @@ export async function createProduct(req, res) {
     available_sizes: sizes,
     is_in_promotion: false,
   }
-  console.log(data);
 
   const { error } = validateProduct(data);
   if (error) {
@@ -194,7 +191,6 @@ export async function getCollections(req, res) {
   } else {
     const products = await getProducts();
     const collections = await getNewCollections();
-    console.log(collections);
     res.render("collections", { layout: "dashboard", collections, products });
   }
 }
@@ -206,10 +202,11 @@ export async function getCollection(req, res) {
 }
 
 export async function createCollection(req, res) {
-  const data = req.body;
+  let data = req.body;
+
   const { error } = validateCollection(data);
   if (error) {
-    res.status(400).json({ error: error });
+    res.status(400).json({ error: error.issues[0].message });
   } else {
     const { error } = await addCollection(data);
     if (error) {
@@ -227,9 +224,9 @@ export async function editCollection(req, res) {
   if (error) {
     res.status(400).json({ error: error.issues[0].message });
   } else {
-    const { error } = await updateCollection(id, data);
+    const { error, errorMessage } = await updateCollection(id, data);
     if (error) {
-      res.status(400).json(error);
+      res.status(400).json({error, errorMessage});
     } else {
       res.status(200).json({ message: 'Coleccion actualizada' });
     }

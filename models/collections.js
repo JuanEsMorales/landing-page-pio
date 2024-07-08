@@ -4,6 +4,7 @@ export async function addCollection(data) {
   try {
     const { name, category, products, destinataries } = data
     const productsJson = JSON.stringify(products)
+    console.log(productsJson);
     const collection = await pool.query("SELECT * FROM collections WHERE products = ?", [productsJson])
     if (collection[0].length > 0) {
       return {
@@ -78,7 +79,7 @@ export async function updateCollection(id, fieldsToUpdate) {
     await pool.query(query, values)
     return { message: "Coleccion actualizada", id }
   } catch (error) {
-    return { error: "Error al actualizar coleccion" }
+    return { error: "Error al actualizar coleccion", errorMessage: error.message }
   }
 }
 

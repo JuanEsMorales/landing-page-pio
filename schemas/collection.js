@@ -29,7 +29,11 @@ const collectionSchema = z.object({
     name: z.string({
       required_error: "El nombre es obligatorio",
       invalid_type_error: "El nombre debe ser de tipo string",
-    }).min(1)
+    }).min(1),
+    price: z.number({
+      required_error: "El precio es obligatorio",
+      invalid_type_error: "El precio debe ser de tipo number",
+    }).min(1),
   })),
 })
 

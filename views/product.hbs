@@ -5,13 +5,13 @@
         <ul class="splide__list">
           <li class="splide__slide">
             <div class="image-container">
-              <img src="../{{image}}" alt="{{name}}">
+              <img src="{{image}}" alt="{{name}}">
             </div>
           </li>
           {{#if secondImage}}
           <li class="splide__slide">
             <div class="image-container">
-              <img src="../{{secondImage}}" alt="{{name}}">
+              <img src="{{secondImage}}" alt="{{name}}">
             </div>
           </li>
           {{/if}}
@@ -23,13 +23,13 @@
         <ul class="splide__list" style="gap: 20px;">
           <li class="splide__slide">
             <div class="image-container">
-              <img src="../{{image}}" alt="{{name}}">
+              <img src="{{image}}" alt="{{name}}">
             </div>
           </li>
           {{#if secondImage}}
           <li class="splide__slide">
             <div class="image-container">
-              <img src="../{{secondImage}}" alt="{{name}}">
+              <img src="{{secondImage}}" alt="{{name}}">
             </div>
           </li>
           {{/if}}
@@ -64,9 +64,9 @@
       <ul class="splide__list">
         {{#each relatedProducts}}
           <li class="splide__slide">
-            <a href="/{{../category}}/{{id}}" class="image-container">
-              <img src="../{{image}}" alt="{{name}}">
-              <img class="image-appear" src="../{{secondImage}}" alt="{{name}}">
+            <a href="/landing/{{id}}" class="image-container">
+              <img src="{{img1_url}}" alt="{{name}}">
+              <img class="image-appear" src="{{img2_url}}" alt="{{name}}">
               <p>{{price}}</p>
             </a>
           </li>
