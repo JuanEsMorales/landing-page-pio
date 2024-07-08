@@ -1,5 +1,6 @@
 body {
   font-family: 'Noto Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  overflow-x: hidden;
 }
 
 .nav-container-options {
@@ -10,7 +11,8 @@ body {
 .slides-wrapper img {
   width: 100%;
   border-radius: 5px;
-  object-fit: cover;
+  height: 100%;
+  object-fit: contain;
 }
 
 #tiendas {
@@ -72,6 +74,7 @@ body {
 
 h2 {
   margin-block: 65px;
+  font-weight: bold;
 }
 
 .image-container {
@@ -84,7 +87,7 @@ h2 {
     width: 100%;
     height: 70px;
     position: absolute;
-    top: 93%;
+    bottom: -40px;
     background-color: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(2px);
     border-top-left-radius: 5px;
@@ -129,7 +132,7 @@ li p {
   }
 
   & .principal {
-    top: 88%;
+    bottom: 0;
   }
 }
 
@@ -193,18 +196,21 @@ li p {
 
 @media  screen and (max-width: 605px) {
   #first-slide {
-    height: auto;
+    height: 100%;
+    max-height: 600px;
+    width: 100vw;
+  }
+
+  #first-slide .splide__slide {
+    height: 600px;
+  }
+
+  .splide {
     width: 100%;
   }
 
-  #second-slide {
-    height: auto;
-    width: 100%;
-  }
-
-  #third-slide {
-    height: auto;
-    width: 100%;
+  .principal {
+    bottom: 0 !important;
   }
 }
 
@@ -222,11 +228,11 @@ li p {
 .products-page {
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   margin-top: 30px;
 }
 .slides-wrapper-product {
-  width: 40%;
+  width: 350px;
   height: 100%;
   display: flex;
   justify-content: flex-start;
@@ -269,7 +275,7 @@ li p {
 }
 
 .information-product {
-  width: 50%;
+  width: auto;
   text-align: start;
   display: flex;
   flex-direction: column;
@@ -340,4 +346,41 @@ li p {
 #realted-products {
   height: auto;
   width: 700px;
+}
+
+@media screen and (max-width: 720px) {
+  .products-page {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .slides-wrapper-product {
+    width: 100%;
+    height: 100%;
+  }
+
+  .information-product {
+    width: 100%;
+    padding: 20px;
+  }
+
+  #realted-products {
+    width: 100%;
+    padding: 10px;
+  }
+
+  #thumbnail-slider {
+    height: 50%;
+    width: 100%;
+  }
+
+  #main-slider {
+    height: 100%;
+    width: 100vw;
+  }
+
+  #main-slider .splide__slide {
+    height: 500px !important;
+  }
 }

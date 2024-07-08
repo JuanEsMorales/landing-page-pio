@@ -17,24 +17,26 @@
     </div>
   </section>
 </div>
-{{#each collections}}
-  <h2>Nueva colección {{name}}</h2>
-  <section class="splide" id="slide-{{id}}" aria-label="Splide Collection Slide">
-    <div class="splide__track">
-      <ul class="splide__list">
-        {{#each products}}
-          <li class="splide__slide">
-            <a href="/landing/{{id}}" class="image-container">
-              <img src="{{img_url1}}" alt="{{name}}">
-              <img class="image-appear" src="{{img_url2}}" alt="{{name}}">
-            </a>
-            <p>${{price}}</p>
-          </li>
-        {{/each}}
-      </ul>
-    </div>
-  </section>
-{{/each}}
+<div class="section-wrapper">
+  {{#each collections}}
+    <h2>Nueva colección {{name}}</h2>
+    <section class="splide section-splide" id="slide-{{id}}" aria-label="Splide Collection Slide">
+      <div class="splide__track">
+        <ul class="splide__list">
+          {{#each products}}
+            <li class="splide__slide">
+              <a href="/landing/{{id}}" class="image-container">
+                <img src="{{img_url1}}" alt="{{name}}">
+                <img class="image-appear" src="{{img_url2}}" alt="{{name}}">
+              </a>
+              <p>${{price}}</p>
+            </li>
+          {{/each}}
+        </ul>
+      </div>
+    </section>
+  {{/each}}
+</div>
 <script>
   document.addEventListener( 'DOMContentLoaded', function() {
     const opt = {
@@ -52,7 +54,17 @@
         },
       }
     }
-    let splide = new Splide( '#first-slide', {
+    const slides = document.querySelectorAll('.splide');
+
+    for (let i = 0; i < slides.length; i++) {
+      if (slides[i].id === 'first-slide') {
+        continue;
+      }
+      const id = slides[i].id.split('-')[1];
+      const splide = new Splide( '#'+slides[i].id, opt);
+      splide.mount();
+    }
+    let splide1 = new Splide( '#first-slide', {
       type   : 'loop',
       drag   : 'free',
       snap   : true,
@@ -61,19 +73,11 @@
       pagination: false,
       gap: 20,
       breakpoints: {
-        975: {
-          perPage: 2,
-        },
-        605: {
+        650: {
           perPage: 1,
         },
       }
     });
-    const slides = document.querySelectorAll('.splide');
-    slides.forEach(slide => {
-      const id = slide.id.split('-')[1];
-      const splide = new Splide( '#'+slide.id, opt);
-      splide.mount();
-    })
-  } );
+    splide1.mount();
+  });
 </script>

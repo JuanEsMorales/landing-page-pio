@@ -67,8 +67,8 @@
             <a href="/landing/{{id}}" class="image-container">
               <img src="{{img1_url}}" alt="{{name}}">
               <img class="image-appear" src="{{img2_url}}" alt="{{name}}">
-              <p>{{price}}</p>
             </a>
+            <p>{{price}}</p>
           </li>
         {{/each}}
       </ul>
@@ -90,7 +90,7 @@
     let thumbnails = new Splide( '#thumbnail-slider', {
       rewind          : true,
       fixedWidth      : 204,
-      fixedHeight     : 108,
+      fixedHeight     : 204,
       isNavigation    : true,
       gap             : 10,
       focus           : 'center',
@@ -103,8 +103,7 @@
       },
       breakpoints : {
         640: {
-          fixedWidth  : 66,
-          fixedHeight : 38,
+          fixedWidth  : 80
         },
       },
     } );
@@ -114,6 +113,14 @@
       drag   : 'free',
       snap   : true,
       perPage: 3,
+      breakpoints: {
+        640: {
+          perPage: 2,
+        },
+        320: {
+          perPage: 1,
+        },
+      },
       perMove: 1,
       pagination: false,
       gap: 20,
