@@ -1,0 +1,21 @@
+<main class="category-page">
+  <h1 style="margin-bottom: 25px;">{{category}} para {{destinataries}}</h1>
+  <section class="categories-wrapper">
+    {{#if products}}
+      {{#each products}}
+        <div class="category-product">
+          <a href="/landing/{{id}}" class="image-container">
+            <img src="{{img1_url}}" alt="{{name}}">
+            <img class="image-appear" src="{{img2_url}}" alt="{{name}}">
+          </a>
+          <p>${{price}}</p>
+          {{#if is_in_promotion}}
+            <small>¡En promoción!</small>
+          {{/if}}
+        </div>
+      {{/each}}
+      {{else}}
+        <h2>No hay productos para este tipo de producto</h2>
+    {{/if}}
+  </section>
+</main>
