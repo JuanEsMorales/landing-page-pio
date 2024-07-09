@@ -1,26 +1,7 @@
 import { addCollection, deleteCollection, getCollectionById, getNewCollections, updateCollection } from "../models/collections.js";
 import { addProduct, deleteProduct, getProductById, getProducts, updateProduct } from "../models/products.js";
-import { addProductToPromotion, deleteProductFromPromotion, getProductsInPromotion, updateProductFromPromotion } from "../models/promotions.js";
 import { validateCollection, validatePartialCollection } from "../schemas/collection.js";
-import { validateProduct, validatePartialProduct, validateProductInPromotion, validatePartialProductInPromotion } from "../schemas/product.js";
-
-export async function formCreateProduct(req, res) {
-  const { id } = req.params;
-  if (id) {
-    const product = await getProductById(id);
-    res.render('new_product', { product });
-  }
-  res.render('new_product');
-}
-
-export async function formCreateCollection(req, res) {
-  const { id } = req.params;
-  if (id) {
-    const collection = await getCollectionById(id);
-    res.render('new_collection', { collection });
-  }
-  res.render('new_collection');
-}
+import { validateProduct, validatePartialProduct } from "../schemas/product.js";
 
 export async function getProduct(req, res) {
   const { id } = req.params;
@@ -38,8 +19,6 @@ export async function getProduct(req, res) {
 export async function createProduct(req, res) {
   const { name, description, category, destinataries, price, tallas } = req.body;
   const images = req.files;
-
-
 
   const imageUrls = Object.values(images).map(fileArray => fileArray[0].path);
 

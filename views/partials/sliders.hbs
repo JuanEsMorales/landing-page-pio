@@ -1,4 +1,4 @@
-<div class="first-slide-wrapper mt-3">
+<div class="first-slide-wrapper">
   <section class="splide" id="first-slide" aria-label="Splide Basic HTML Example">
     <div class="splide__track">
       <ul class="splide__list">
@@ -7,8 +7,9 @@
             <a href="/landing/{{id}}" class="image-container">
               <div class="principal" style="font-weight: bold; color: #000">
                 {{name}} <br />
-                <small style="color: #ab9675;">¡En promoción!</small>
+                <small style="font-weight: bold; font-size: 20px">${{price}}</small>
               </div>
+              <small class="promo">¡En promoción!</small>
               <img src="{{img1_url}}" alt="{{name}}">
             </a>
           </li>
@@ -60,7 +61,7 @@
       if (slides[i].id === 'first-slide') {
         continue;
       }
-      const id = slides[i].id.split('-')[1];
+      slides[i].style.marginBottom = '150px';
       const splide = new Splide( '#'+slides[i].id, opt);
       splide.mount();
     }

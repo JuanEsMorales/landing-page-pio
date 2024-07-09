@@ -29,6 +29,8 @@ router.post('/login', );
 
 router.get('/logout', );
 
+router.get('/', (req, res) => { res.redirect('/admin/products') });
+
 router.get('/products', getAllProducts);
 
 router.post('/products/new', upload.fields([{ name: 'img1' }, { name: 'img2' }, { name: 'img3' }]), createProduct);

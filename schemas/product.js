@@ -8,7 +8,7 @@ const productSchema = z.object({
   description: z.string({
     required_error: "La descripción es obligatoria",
     invalid_type_error: "La descripción debe ser de tipo string",
-  }).min(1).max(100),
+  }).min(1).max(1000),
   category: z.string({
     required_error: "La categoría es obligatoria",
     invalid_type_error: "La categoría debe ser de tipo string",

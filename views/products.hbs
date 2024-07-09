@@ -1,7 +1,7 @@
 <div class="p-3 w-100 d-flex justify-content-center align-items-start gap-3" style="position: relative;">
-  <div class="container-all-products w-75">
+  <div class="container-all-products">
     {{#each products}}
-      <div class="card bg-dark" style="width: 200px;" data-bs-theme="dark" id="card-{{id}}">
+      <div class="card bg-dark" data-bs-theme="dark" id="card-{{id}}">
         <div class="card-header">
           {{name}}
           {{#if is_in_promotion}}
@@ -22,13 +22,13 @@
       </div>
     {{/each}}
   </div>
-  <form class="w-25" style="position: sticky; top: 60px; max-height: 660px; overflow-y: auto; overflow-x: hidden;">
+  <form style="position: sticky; top: 60px; height: calc(100vh - 100px); overflow-y: auto; overflow-x: hidden; width: 25%;">
     <div class="form-floating mb-1">
       <input type="text" class="form-control" id="name" placeholder="Nombre" >
       <label for="name" class="form-label">Nombre</label>
     </div>
     <div class="form-floating mb-1">
-      <textarea class="form-control" id="description" placeholder="Descripción" rows="3" ></textarea>
+      <textarea class="form-control" id="description" placeholder="Descripción" rows="2" style="resize: none; height: auto;" ></textarea>
       <label for="description" class="form-label">Descripción</label>
     </div>
     <div class="mb-1">
@@ -84,6 +84,7 @@
 </div>
 <script>
   const form = document.querySelector('form');
+  const description = document.querySelector('#description');
   const img_1 = document.querySelector('.img1');
   const img_2 = document.querySelector('.img2');
   const img_3 = document.querySelector('.img3');
@@ -173,6 +174,13 @@
     img_3.src = '';
     form.reset()
   });
+
+  description.addEventListener('input', autoResize)
+
+  function autoResize() {
+    this.style.height = 'auto'; // Resetea la altura a 'auto' para recalcular la altura correcta
+    this.style.height = `${this.scrollHeight}px`; // Ajusta la altura al scrollHeight del textarea
+  }
 
   const buttonsEdit = document.querySelectorAll('.edit');
   const buttonsDelete = document.querySelectorAll('.delete');

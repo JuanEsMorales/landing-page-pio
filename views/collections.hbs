@@ -1,8 +1,8 @@
 <div class="p-3 w-100 d-flex justify-content-center align-items-start gap-3" style="position: relative;">
-  <div class="container-all-collections w-75">
+  <div class="container-all-collections">
     {{#if collections}}
       {{#each collections}}
-        <div class="card bg-dark" style="width: 250px;" data-bs-theme="dark" id="card-{{id}}">
+        <div class="card bg-dark" data-bs-theme="dark" id="card-{{id}}">
         <div class="card-header">
           {{id}}, {{name}}, {{persons_destinataries}}
         </div>
@@ -36,7 +36,7 @@
        <h1>No hay colecciones</h1>
     {{/if}}
   </div>
-  <form class="w-25" style="position: sticky; top: 60px; max-height: 660px; overflow-y: auto; overflow-x: hidden;">
+  <form style="position: sticky; top: 60px; height: calc(100vh - 100px); overflow-y: auto; overflow-x: hidden;">
     <div class="form-floating mb-1">
       <input type="text" class="form-control" id="name" placeholder="Nombre" >
       <label for="name" class="form-label">Nombre</label>
