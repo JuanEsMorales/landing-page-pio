@@ -4,7 +4,7 @@ import { getProductsInPromotion } from "../models/promotions.js"
 
 export async function getProduct(req, res) {
   const product = await getProductById(req.params.id);
-  const relatedProducts = await getRelatedProducts(product.category, product.id);
+  const relatedProducts = await getRelatedProducts(product.category, product.persons_destinataries, product.id);
   if (product.is_in_promotion) {
     const { id, name, description, img1_url, img2_url, img3_url, price, previous_price, category, available_sizes } = product;
     return res.render('product', {

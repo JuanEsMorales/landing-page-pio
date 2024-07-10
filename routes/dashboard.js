@@ -3,7 +3,7 @@ import multer from 'multer';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
 import cloudinary from '../cloudinaryConfig.js';
-import { createCollection, createProduct, editCollection, editProduct, getAllProducts, getAllProductsInPromotion, getCollection, getCollections, getProduct, removeCollection, removeProduct } from '../controllers/dashboard.js';
+import { createCollection, createProduct, editCollection, editProduct, getAllProducts, getAllProductsInPromotion, getCollection, getCollections, getProduct, logOut, removeCollection, removeProduct } from '../controllers/dashboard.js';
 
 const router = Router();
 
@@ -18,16 +18,7 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage: storage });
 
-
-router.get('/register', );
-
-router.post('/register', );
-
-router.get('/login', );
-
-router.post('/login', );
-
-router.get('/logout', );
+router.get('/logout', logOut);
 
 router.get('/', (req, res) => { res.redirect('/admin/products') });
 

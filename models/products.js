@@ -65,11 +65,11 @@ export async function getProducts(
   }
 }
 
-export async function getRelatedProducts(category, id) {
+export async function getRelatedProducts(category, destinataries, id) {
   try {
     const products = await pool.query(
-      "SELECT * FROM products WHERE category = ? AND id != ? LIMIT 6",
-      [category, id]
+      "SELECT * FROM products WHERE category = ? AND persons_destinataries = ? AND id != ? LIMIT 6",
+      [category, destinataries, id]
     )
     return products[0]
   } catch (error) {

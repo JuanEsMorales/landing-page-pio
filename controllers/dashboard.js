@@ -226,3 +226,7 @@ export async function getAllProductsInPromotion(req, res) {
   const products = await getProductsInPromotion();
   res.send(products);
 }
+
+export async function logOut(req, res) {
+  res.clearCookie('access_token').redirect('/admin');
+}
