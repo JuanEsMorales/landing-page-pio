@@ -53,7 +53,6 @@ const verifyUsers = (req, res, next) => {
 };
 
 app.set("views", path.join(__dirname, "views"))
-console.log('Views Directory:', path.join(__dirname, 'views'));
 
 app.engine('hbs', engine({
   extname: 'hbs',
