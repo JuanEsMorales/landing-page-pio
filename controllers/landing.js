@@ -39,7 +39,7 @@ export async function getProduct(req, res) {
 export async function getProductsForSlides(req, res) {
   const productsInPromotion = await getProductsInPromotion();
   const collections = await getNewCollections();
-  res.render('index', { productsInPromotion, collections });
+  res.render('index.hbs', { productsInPromotion, collections });
 }
 
 export async function getProductsForCategory(req, res) {
