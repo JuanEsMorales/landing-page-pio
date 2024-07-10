@@ -10,9 +10,8 @@ import dashboardRouter from './routes/dashboard.js'
 import usersRouter from './routes/users.js';
 import { PORT, SECRET } from './config.js';
 
+
 const app = express();
-
-
 
 const __dirname = import.meta.dirname;
 
